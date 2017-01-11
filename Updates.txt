@@ -1,0 +1,11 @@
+8/1/2017
+
+HUGE UPDATE!
++ Added 7 new monsters!
++ Added 10 new levels to play!
++ Reduced lag a slight bit.
++ Added 6 new types of objects!
++ Made the sidebar look more pleasing
+
+- increased the amount of code from 1029 to 1874.
+
