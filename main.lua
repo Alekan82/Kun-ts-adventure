@@ -147,6 +147,10 @@ function love.load()
         Burn = love.audio.newSource("Sound/burn.wav","static"),
         get1 = love.audio.newSource("Sound/get1.wav","static"),
         Locked = love.audio.newSource("Sound/Locked.mp3","static"),
+        LockRed = love.audio.newSource("Sound/LockRed.wav","static"),
+        LockGreen = love.audio.newSource("Sound/LockGreen.wav","static"),
+        LockBlue = love.audio.newSource("Sound/LockBlue.wav","static"),
+        LockYellow = love.audio.newSource("Sound/LockYellow.wav","static"),
         Teleport = love.audio.newSource("/Sound/Teleport.wav","static")
     }
     Music = {
