@@ -168,6 +168,7 @@ function love.load()
         Wait = SPEED_SLOW,
         Sliding = false,
         TIMELEFT = 0,
+        steps = 0;
         Inventory = {
             Flippers = false,
             RedKey = false,
@@ -265,19 +266,19 @@ function love.load()
     Special = {
         Iceway = "Down",
     }
-    CurrentStage = 1-1
+    CurrentStage = 0
     COOLDOWN = {ice=10,bounce=0,teeth=10,conveyor=0,bug=0,glider=0,tank=0,walker=0,fireball=0,blob=0}
     levelOrder = {"Lesson 1","Lesson 2","Lesson 3","Lesson 4","Lesson 5","Lesson 6","Lesson 7","Lesson 8","Bugging","back n forth","From dirt to floor","A moveable level","Tricked","Trinity","NutsAndBolt","Brushfire","Elementary","Cellblocked","Nice day","Digger","Castle moat","Hunt","Forced entry","Oorto geld","Blobnet","Go with the flow","Ping pong","Pier seven","Mishmesh","Seeing stars","Spooks","Corridor","Digdirt","Morton","Steam"}
     LevelHint = {
-    			["Lesson 1"]="Collect all tiger biscuits to get past the iron door",
-    			["Lesson 2"]="Use keys to open doors. Green keys does never get destroyed when used",
-    			["Lesson 3"]="Push blocks into water to make dirt. Watch out for monsters",
-    			["Lesson 4"]="Suction boots for force floors. Fire boots for fire. Flippers for water. Skates for ice",
-    			["Lesson 5"]="The blue button controls the tanks. The green button toggles walls",
-    			["Lesson 6"]="Blue walls may be fake. Some invnisible walls never appear. There can be extra kex on some levels",
-    			["Lesson 7"]="The thief takes your tools. New walls can appear behind you when stepped on grey buttons",
+    			["Lesson 1"]="Collect all tiger biscuits to get\npast the iron door",
+    			["Lesson 2"]="Use keys to open doors. Green keys\ndoes never get destroyed when used.\nKeep in mind that u cant have two\nkeys of the same color in your\ninventory at once.",
+    			["Lesson 3"]="Push blocks into water to make dirt.\nWatch out for monsters",
+    			["Lesson 4"]="Suction boots for force floors. Fire\nboots for fire. Flippers for water.\nSkates for ice",
+    			["Lesson 5"]="The blue button controls the tanks.\nThe green button toggles walls",
+    			["Lesson 6"]="Blue walls can either be a normal\nblock or just nothing. There can be\ninvisible blocks that may show up\nwhen u bump into them.",
+    			["Lesson 7"]="The thief takes your tools. New walls\ncan appear behind you when stepped\non grey buttons",
     			["Lesson 8"]="Monsters can be stopped by dirt and gravel",
-    			["From dirt to floor"]="Monsters and blocks ignore the hints"}
+    			["From dirt to floor"]="Monsters and blocks ignore\nthe hints"}
     BeatStage = false;
     index = {"Chip01","Chip02"}--"Chip03","Chip04","Chip05"
     MusicIndex = index[love.math.random(#index)]
@@ -348,6 +349,7 @@ function love.load()
         else
             KexLeft = #Workspace["Point"]
         end
+        Player.steps = 0;
         Started = true;
     end
     function gayloop(k)
@@ -583,6 +585,7 @@ function love.load()
                 i.Y = i.Y + (-MovementDirections[k].y)
             end
         end
+        Player.steps = Player.steps + 1
     end
     function check(k)
         for e,f in pairs(Workspace)do
@@ -1613,50 +1616,27 @@ end
 function love.draw()
     love.graphics.setColor(255,255,255)
     for _, v in pairs(Floor)do love.graphics.draw(Texture.Plate,v.X,v.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)end
+    local RGB = {R={r=255,g=0,b=0},B={r=0,g=0,b=255},G={r=0,g=255,b=0},Y={r=255,g=255,b=0}}
     for i,v in pairs(Workspace)do
         for _,f in pairs(v)do
-            if i == "YellowKey"then
-                love.graphics.setColor(255,200,0)
-                love.graphics.draw(Texture.Key,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-            elseif i == "GreenKey"then
-                love.graphics.setColor(0,255,0)
-                love.graphics.draw(Texture.Key,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-            elseif i == "BlueKey"then
-                love.graphics.setColor(0,0,255)
-                love.graphics.draw(Texture.Key,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-            elseif i == "RedKey"then
-                love.graphics.setColor(255,0,0)
-                love.graphics.draw(Texture.Key,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
+            if i == "YellowKey"or i=="GreenKey"or i=="BlueKey"or i=="RedKey"or i=="LockR"or i=="LockY"or i=="LockB"or i=="LockG"then
+                if string.sub(i,0,4) == "Lock"then
+                    love.graphics.setColor(255,255,255)
+                    love.graphics.draw(Texture.Block,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
+                    love.graphics.draw(love.graphics.newImage("/Texture/Objects/L_OUTLINE.png"),f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
+                    love.graphics.setColor(RGB[string.sub(i,#i)].r,RGB[string.sub(i,#i)].g,RGB[string.sub(i,#i)].b)
+                    love.graphics.draw(Texture.Lock,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
+                else
+                    local Color = string.sub(i,1,1)
+                    love.graphics.setColor(RGB[Color].r,RGB[Color].g,RGB[Color].b)
+                    love.graphics.draw(Texture.Key,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
+                end
             elseif i == "Dirt"then
                 love.graphics.setColor(102,51,0)
                 love.graphics.rectangle("fill",f.X,f.Y,BLOCKSIZE.X,BLOCKSIZE.Y)
             elseif i == "Teeth"then
                 love.graphics.setColor(255,255,255)
                 love.graphics.draw(Texture[f.image],f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-            elseif i == "LockR"then
-                love.graphics.setColor(255,255,255)
-                love.graphics.draw(Texture.Block,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.draw(love.graphics.newImage("/Texture/Objects/L_OUTLINE.png"),f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.setColor(255,0,0)
-                love.graphics.draw(Texture.Lock,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-            elseif i == "LockY"then
-                love.graphics.setColor(255,255,255)
-                love.graphics.draw(Texture.Block,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.draw(love.graphics.newImage("/Texture/Objects/L_OUTLINE.png"),f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.setColor(255,200,0)
-                love.graphics.draw(Texture.Lock,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-            elseif i == "LockB"then
-                love.graphics.setColor(255,255,255)
-                love.graphics.draw(Texture.Block,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.draw(love.graphics.newImage("/Texture/Objects/L_OUTLINE.png"),f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.setColor(0,0,255)
-                love.graphics.draw(Texture.Lock,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-            elseif i == "LockG"then
-                love.graphics.setColor(255,255,255)
-                love.graphics.draw(Texture.Block,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.draw(love.graphics.newImage("/Texture/Objects/L_OUTLINE.png"),f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
-                love.graphics.setColor(0,255,0)
-                love.graphics.draw(Texture.Lock,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
             elseif i=="BlueTile"or i=="BlueTinged"then
                 love.graphics.setColor(255,255,255);
                 love.graphics.draw(Texture.BlueWall,f.X,f.Y,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02);
@@ -1759,13 +1739,13 @@ function love.draw()
         love.graphics.draw(Texture.Plate,(BLOCKSIZE.X*13.5)+(BLOCKSIZE.X*i)-BLOCKSIZE.X,BLOCKSIZE.Y*10.5)
         love.graphics.draw(Texture.Plate,(BLOCKSIZE.X*13.5)+(BLOCKSIZE.X*i)-BLOCKSIZE.X,(BLOCKSIZE.Y*10.5)+BLOCKSIZE.Y)
     end
+
     local tX,kX = 0,0
-    local Keys = {R={r=255,g=0,b=0},B={r=0,g=0,b=255},G={r=0,g=255,b=0},Y={r=255,g=255,b=0}}
     for i,v in pairs(Player.Inventory)do
     	if v then
         	if string.sub(i,#i-2)=="Key"then
         		local color = string.sub(i,0,1)
-        		love.graphics.setColor(Keys[color].r,Keys[color].g,Keys[color].b)
+        		love.graphics.setColor(RGB[color].r,RGB[color].g,RGB[color].b)
         		love.graphics.draw(Texture.Key,BLOCKSIZE.X*(13.5+kX),BLOCKSIZE.Y*11.5,0,BLOCKSIZE.X*0.02,BLOCKSIZE.Y*0.02)
         		kX = kX + 1
         	else
@@ -1775,17 +1755,27 @@ function love.draw()
         	end
     	end
     end
+
     if Player.Hint then
-        love.graphics.setColor(255,255,255)
-        love.graphics.print(LevelHint[levelOrder[CurrentStage]],BLOCKSIZE.X*13.1,BLOCKSIZE.Y*4)
+        love.graphics.setColor(0,0,0)
+        love.graphics.rectangle("fill",BLOCKSIZE.X*3,BLOCKSIZE.Y*2,BLOCKSIZE.X*7,BLOCKSIZE.Y*9)
+        love.graphics.setColor(100,100,100)
+        love.graphics.rectangle("line",BLOCKSIZE.X*3,BLOCKSIZE.Y*2,BLOCKSIZE.X*7,BLOCKSIZE.Y*9)
+        love.graphics.setColor(100,240,255)
+        love.graphics.setFont(love.graphics.setNewFont(18))
+        love.graphics.print(LevelHint[levelOrder[CurrentStage]],BLOCKSIZE.X*3.1,BLOCKSIZE.Y*3)
     end
     if BeatStage then
-    	love.graphics.setFont(love.graphics.setNewFont(20))
+    	love.graphics.setFont(love.graphics.setNewFont(13))
     	love.graphics.setColor(150,150,150)
-    	love.graphics.rectangle("fill",BLOCKSIZE.X*3,BLOCKSIZE.Y*2,BLOCKSIZE.X*8,BLOCKSIZE.Y*9)
+    	love.graphics.rectangle("fill",BLOCKSIZE.X*4,BLOCKSIZE.Y*2,BLOCKSIZE.X*5,BLOCKSIZE.Y*9)
     	love.graphics.setColor(0,0,0)
-    	love.graphics.rectangle("line",BLOCKSIZE.X*3,BLOCKSIZE.Y*2,BLOCKSIZE.X*8,BLOCKSIZE.Y*9)
-    	love.graphics.print("Time Bonus",BLOCKSIZE.X*3,BLOCKSIZE.Y*2)
+    	love.graphics.rectangle("line",BLOCKSIZE.X*4,BLOCKSIZE.Y*2,BLOCKSIZE.X*5,BLOCKSIZE.Y*9)
+    	love.graphics.print("Finished! Good work!",BLOCKSIZE.X*5,BLOCKSIZE.Y*2.5)
+        love.graphics.print("Time bouns: "..math.floor((999-Player.TIMELEFT)/3),BLOCKSIZE.X*5,BLOCKSIZE.Y*3)
+        love.graphics.print("Level bonus "..CurrentStage*250,BLOCKSIZE.X*5,BLOCKSIZE.Y*3.5)
+        love.graphics.print("Moves: "..Player.steps,BLOCKSIZE.X*5,BLOCKSIZE.Y*4)
+        love.graphics.print("Total score: "..math.floor((CurrentStage*300)+((999-Player.TIMELEFT)/2)-Player.steps*10),BLOCKSIZE.X*5,BLOCKSIZE.Y*4.5)
     end
     if Started then
     	love.graphics.setColor(0,0,0)
